@@ -9,11 +9,8 @@ from dto.composite.I_Scene import IScene
 
 class CircuitsDTO(IScene):
     compnayid: int
-
     companyname: str
-
     countryid: int
-
     countryname: str
     regionid: int
     regionname: str
@@ -23,6 +20,7 @@ class CircuitsDTO(IScene):
     circuitmnemonico: str
     type: str
     metadata: str
+
     def __init__(self, obj):
         self.compnayid = obj.companyid
         self.companyname = obj.companyname
@@ -36,19 +34,24 @@ class CircuitsDTO(IScene):
         self.circuitmnemonico = obj.circuitname
         self.type = "Composite"
         self.metadata = "None"
-        self._children: List[ILayers] = []
+        self.children: List[ILayers] = []
 
-    def add(self, component: ILayers) -> None:
-        self._children.append(component)
+    def add_layers(self, layer: ILayers):
+        self.children.append(layer)
 
     def generateSceneJSON(self):
         return {
             "id": self.circuitmnemonico,
             "type": self.type,
             "metadata": self.metadata,
-            "children": [self.iterate_children()]
+            "children" : self.children
         }
 
-    def iterate_children(self):
-        for item in self._children:
-            print(item.generateLayersJSON())
+    def __repr__(self):
+        return str({
+            "id": self.circuitmnemonico,
+            "type": self.type,
+            "metadata": self.metadata,
+            "children": self.children
+        })
+

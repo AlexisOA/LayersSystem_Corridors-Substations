@@ -4,4 +4,4 @@ class IScene(metaclass=ABCMeta):
 
     @abstractmethod
     def generateSceneJSON(self):
-        "Print information"
+        """"""

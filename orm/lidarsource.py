@@ -16,12 +16,6 @@ class LidarSource(Base):
     serverid = Column(Integer, ForeignKey('servers.id'))
     yearid = Column(Integer, ForeignKey('years.id'))
 
-    def __init__(self, id, name, path, circuitid, serverid, yearid):
-        self.name = name
-        self.path = path
-        self.circuitid = circuitid
-        self.serverid = serverid
-        self.yearid = yearid
 
 class Server(Base):
     __tablename__ = 'servers'

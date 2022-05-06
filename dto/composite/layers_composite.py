@@ -14,6 +14,9 @@ class LayersComposite(ILayers):
     def add(self, component: ILayers) -> None:
         self._children.append(component)
 
+    def count(self) -> int:
+        return len(self._children)
+
     def generateLayersJSON(self):
         for item in self._children:
             item.generateLayersJSON()
