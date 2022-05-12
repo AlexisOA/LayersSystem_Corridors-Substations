@@ -26,11 +26,4 @@ class SceneMap3857(IScene):
             "wtm_template_layers": self.wtm_template_layers
         }
 
-    def __repr__(self):
-        return str({
-            "id": self.id,
-            "type": self.types,
-            "metadata": self.metadata,
-            "wtm_template_layers": self.wtm_template_layers
-        })
 

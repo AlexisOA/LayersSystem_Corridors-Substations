@@ -8,8 +8,9 @@ class GeoPointcloudDAO():
         self.session = session
 
     def getPointcloudFromCircuit(self, circuits):
+        print(circuits.circuitid)
         return self.session.query(LidarSource.path.label('path'),
-                                  Circuits.mnemonico.label('circuitename'),
+                                  Circuits.mnemonico.label('circuitname'),
                                   Server.name.label('servername')
                                   ).join(LidarSource, LidarSource.circuitid == Circuits.id
                                          ).join(Server, LidarSource.serverid == Server.id

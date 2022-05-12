@@ -1,3 +1,4 @@
+from geoalchemy2 import Geometry
 from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey, Table, Numeric, Boolean
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
@@ -83,3 +84,21 @@ class Circuits(Base):
     stationid = Column(Integer)
 
     lidarsource = relationship('LidarSource', backref='lidarsources', lazy=True)
+
+
+
+
+class CircuitGeoms(Base):
+    __tablename__ = 'circuitgeoms'
+    id = Column(Integer, primary_key=True)
+    geomtypeid = Column(Integer, ForeignKey('circuitgeomtypes.id'))
+    circuitid = Column(Integer, ForeignKey('circuits.id'))
+    yearid = Column(Integer)
+    geom = Column(Geometry('POINT'))
+
+
+class CircuitGeomTypes(Base):
+    __tablename__ = 'circuitgeomtypes'
+    id = Column(Integer, primary_key=True)
+    name = Column(Text)
+    circuitgeoms = relationship('CircuitGeoms', backref='circuitgeoms', lazy=True)

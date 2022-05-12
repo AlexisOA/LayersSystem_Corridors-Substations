@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists
-
 from connection.config import config
+import psycopg2
 
 
 def get_engine(user, passwd, host, port, db):
@@ -34,4 +34,11 @@ def get_session():
     return session
 
 
+def get_connection():
+    params = config()
+    conn = psycopg2.connect(**params)
+    return conn
 
+
+def close_connection(conn):
+    conn.close()

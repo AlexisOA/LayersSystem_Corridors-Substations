@@ -33,7 +33,7 @@ class CircuitsDTO(IScene):
         self.circuitid = obj.circuitid
         self.circuitmnemonico = obj.circuitname
         self.type = "Composite"
-        self.metadata = "None"
+        self.metadata = "No circuit Metadata"
         self.children: List[ILayers] = []
 
     def add_layers(self, layer: ILayers):
@@ -44,14 +44,8 @@ class CircuitsDTO(IScene):
             "id": self.circuitmnemonico,
             "type": self.type,
             "metadata": self.metadata,
-            "children" : self.children
-        }
+            "children" : [
+                child.generateLayersJSON() for child in self.children
+            ]}
 
-    def __repr__(self):
-        return str({
-            "id": self.circuitmnemonico,
-            "type": self.type,
-            "metadata": self.metadata,
-            "children": self.children
-        })
 

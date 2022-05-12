@@ -4,31 +4,20 @@ from dto.composite.I_Layers import ILayers
 
 class GeoPointcloudDTO(ILayers):
     id: int = ""
-
     types: str = "GeoPointcloud"
     metadata: str = ""
     url: str = ""
 
     def __init__(self, obj):
-        self.id = obj['path']
+        self.id = obj['circuitname']
         self.types = "GeoPointcloud"
-        self.metadata = None
-        self.url = "https://d35c0y5ctcznbt.cloudfront.net/Models/CENTRO/101C_220LET-MOT"
+        self.metadata = "No pointcloud metadata"
+        self.url = str(obj['path'])
 
     def generateLayersJSON(self):
-        print({
+        return {
             "id": str(self.id) + str("/Pointcloud"),
             "type": self.types,
             "metadata": self.metadata,
-            "url": self.url
-        })
-
-    def __repr__(self):
-        return str({
-            "id": str(self.id) + str("/Pointcloud"),
-            "type": self.types,
-            "metadata": self.metadata,
-            "url": self.url
-        })
-
-
+            "url": "https://d35c0y5ctcznbt.cloudfront.net" + self.url
+        }

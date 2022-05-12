@@ -5,6 +5,9 @@ from dto.composite.I_Scene import IScene
 
 class ScenesComposite(IScene):
     def __init__(self):
+        self.id = "SCENE"
+        self.type = "Composite"
+        self.metada = "Non Metadata"
         self._children: List[IScene] = []
 
     def add(self, component: IScene):
@@ -17,5 +20,10 @@ class ScenesComposite(IScene):
         return len(self._children)
 
     def generateSceneJSON(self):
-        for item in self._children:
-            item.generateSceneJSON()
+        return {"id": self.id,
+                "type": self.type,
+                "metadata": self.metada,
+                "children": [
+                    child.generateSceneJSON() for child in self._children
+                ]}
+

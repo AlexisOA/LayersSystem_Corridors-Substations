@@ -14,7 +14,9 @@ class Scene(IScene):
         self.children.append(scene)
 
     def generateSceneJSON(self):
-        return str({"id": self.id,
-                    "type": self.type,
-                    "metadata": self.metada,
-                    "children": self.children})
+        return {"id": self.id,
+                "type": self.type,
+                "metadata": self.metada,
+                "children": [
+                    child.generateSceneJSON() for child in self.children
+                ]}
