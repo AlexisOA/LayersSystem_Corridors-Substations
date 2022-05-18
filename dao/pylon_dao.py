@@ -16,8 +16,9 @@ class PylonDAO():
                                   Pylons.plate.label('plate'),
                                   func.st_x(Pylons.geom).label('x'),
                                   func.st_y(Pylons.geom).label('y'),
-                                  func.st_z(Pylons.geom).label('z')
+                                  func.st_z(Pylons.geom).label('z'),
+                                  func.ST_AsText(func.ST_Transform(Pylons.geom, 3857)).label('geom_text')
                                   ).join(CircuitsPylonsXref, CircuitsPylonsXref.circuitid == Circuits.id
                                          ).join(Pylons, CircuitsPylonsXref.pylonid == Pylons.id
-                                                ).filter(Circuits.id == circuits.circuitid).all()
+                                                ).filter(Circuits.id == circuits.id).all()
 

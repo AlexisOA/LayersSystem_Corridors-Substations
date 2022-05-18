@@ -9,6 +9,3 @@ class Year(Base):
     __tablename__ = 'years'
     id = Column(Integer, primary_key=True)
     year = Column(Integer)
-
-    def __init__(self, id, year):
-        self.year = year

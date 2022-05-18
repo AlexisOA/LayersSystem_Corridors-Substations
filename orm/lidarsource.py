@@ -6,7 +6,8 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
-#SmallInteger
+
+# SmallInteger
 
 class LidarSource(Base):
     __tablename__ = 'lidarsources'
@@ -25,6 +26,7 @@ class Server(Base):
     server = Column(Text)
     port = Column(Integer)
     lidarsource = relationship('LidarSource', backref='servers', lazy=True)
+
 
 class Circuits(Base):
     __tablename__ = 'circuits'
@@ -53,7 +55,7 @@ class Circuits(Base):
     subterrainlongitude = Column(Numeric)
     submarinelongitude = Column(Numeric)
     morefrequencyconf = Column(Text)
-    morerestrictiveconductorid =  Column(Integer)
+    morerestrictiveconductorid = Column(Integer)
     springmva = Column(Numeric)
     summermva = Column(Numeric)
     autommva = Column(Numeric)
@@ -84,8 +86,8 @@ class Circuits(Base):
     stationid = Column(Integer)
 
     lidarsource = relationship('LidarSource', backref='lidarsources', lazy=True)
-
-
+    spansource = relationship('SpanHipothesisGeoms', backref='spansource', lazy=True)
+    electricspan = relationship('ElectricSpans', backref='electricspan', lazy=True)
 
 
 class CircuitGeoms(Base):
@@ -102,3 +104,39 @@ class CircuitGeomTypes(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Text)
     circuitgeoms = relationship('CircuitGeoms', backref='circuitgeoms', lazy=True)
+
+
+class SpanHipothesisGeoms(Base):
+    __tablename__ = 'spanhipothesisgeoms'
+    id = Column(Integer, primary_key=True)
+    hipothesisid = Column(Integer, ForeignKey('hipothesis.id'))
+    electricspanid = Column(Integer, ForeignKey('electricspans.id'))
+    phase = Column(Integer)
+    geom = Column(Geometry('LINESTRING'))
+    yearid = Column(Integer, ForeignKey('years.id'))
+    circuitid = Column(Integer, ForeignKey('circuits.id'))
+
+
+class Year(Base):
+    __tablename__ = 'years'
+    id = Column(Integer, primary_key=True)
+    year = Column(Integer)
+    yearsource = relationship('SpanHipothesisGeoms', backref='yearsource', lazy=True)
+
+
+class ElectricSpans(Base):
+    __tablename__ = 'electricspans'
+    id = Column(Integer, primary_key=True)
+    circuitid = Column(Integer, ForeignKey('circuits.id'))
+    beginpylonid = Column(Integer)
+    endpylonid = Column(Integer)
+    ut = Column(Text)
+
+
+class Hipothesis(Base):
+    __tablename__ = 'hipothesis'
+    id = Column(Integer, primary_key=True)
+    name = Column(Text)
+    longname = Column(Text)
+    wind = Column(Integer)
+    temperature = Column(Numeric)

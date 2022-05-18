@@ -1,9 +1,21 @@
 import psycopg2
 import numpy as np
 from connection.database import get_connection, close_connection
-
+from orm.lidarsource import Circuits, CircuitGeoms, CircuitGeomTypes
+from sqlalchemy import func
 
 class CircuitlineDAO:
+
+    def __init__(self, session):
+        self.session = session
+
+    def getCircuitLineById(self, circuits):
+        return self.session.query(Circuits.mnemonico.label('id'),
+                                    func.ST_AsText(func.ST_Transform(CircuitGeoms.geom, 3857)).label('geom_text'),
+                                  # func.ST_AsText(CircuitGeoms.geom).label('geom_text'),
+                                     ).join(CircuitGeoms,CircuitGeoms.circuitid == Circuits.id
+                                    ).join(CircuitGeomTypes,CircuitGeomTypes.id == CircuitGeoms.geomtypeid
+                                           ).filter(CircuitGeomTypes.name == "Tower_String").filter(Circuits.id == circuits.id).all()
 
     def runQueryById(self, query, id):
         conn = None

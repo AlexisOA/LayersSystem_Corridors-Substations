@@ -3,10 +3,15 @@ from connection.database import get_session
 from dao.circuitline_dao import CircuitlineDAO
 from dao.circuitview_dao import CircuitViewDao
 from dao.geopointcloud_dao import GeoPointcloudDAO
+from dao.hipothesis_dao import HipothesisDAO
 from dao.pylon_dao import PylonDAO
+from dao.towerline_dao import TowerLineDao
+from dao.towerline_dao_alchemy import TowerLineDao2
 from dto.circuitlines_dto import CircuitLinesDTO
 from dto.circuits_dto import CircuitsDTO
 from dto.composite.scene_composite import ScenesComposite
+from dto.geometries.linestring_collect import LineStringCollection
+from dto.geometries.point import Point
 from dto.geopointcloud_dto import GeoPointcloudDTO
 from dto.labeledpolyline_dto import LabeledPolylineDTO
 from dto.pylon_dto import PylonDTO
@@ -14,65 +19,79 @@ from dto.pylonset_dto import PylonSetDTO
 from dto.scenemap_dto import SceneMap3857
 import json
 import os
-import re
-from orm.lidarsource import Circuits, CircuitGeoms, CircuitGeomTypes
-from sqlalchemy import func
 import time
+from dto.towerline_dto import TowerLineDTO
+from dto.towerlineset_dto import TowerLineSetDTO
 
 if __name__ == '__main__':
+    inicio = time.time()
     session = get_session()
     scene_json = SceneMap3857()
     composite_scene = ScenesComposite()
 
-    circuitsview = CircuitViewDao(session).getCircuitsForZone('CENTRO')
+    circuits_view = CircuitViewDao(session).getCircuitsNewForZone('CENTRO')
 
     # scene_main = Scene()  NOT USE
     composite_scene.add(scene_json)
-
-    for circuits in circuitsview:
+    for circuits in circuits_view:
         circ = CircuitsDTO(circuits)
         # Get all pointclouds from circuit
-        lidar_query = GeoPointcloudDAO(session).getPointcloudFromCircuit(circuits)
+        print(circuits.id)
+        lidar_query = GeoPointcloudDAO(session).test(circuits)
         # Iterate pointcloud and serialize to GeoPointCloudDTO
         for lidar in lidar_query:
             if lidar:
                 geo = GeoPointcloudDTO(lidar)
                 circ.add_layers(geo)
 
-        # Testing circuitline
-        print("####### Testing circuiteline #######")
-        t_init = time.time()
-        circuit_line = session.query(Circuits.mnemonico.label('id'),
-                                     func.ST_AsText(CircuitGeoms.geom).label('geom_text')
-                                     ).join(CircuitGeoms,CircuitGeoms.circuitid == Circuits.id
-                                    ).join(CircuitGeomTypes,CircuitGeomTypes.id == CircuitGeoms.geomtypeid
-                                           ).filter(CircuitGeomTypes.name == "Tower_String").filter(Circuits.id == circuits.circuitid).all()
-        # circuiteline_test = CircuitLinesDTO(circuit_line.circuitmnemonico, circuit_line.)
-        arr_split = []
+        # circuitline
+        circuit_line = CircuitlineDAO(session).getCircuitLineById(circuits)
+        linea = []
         for object_circuit in circuit_line:
             linestring_z = str(object_circuit.geom_text).replace("GEOMETRYCOLLECTION Z (LINESTRING Z (", "")
             arr_split = linestring_z.split("LINESTRING Z (")
-        circuiteline = CircuitLinesDTO(circuits.circuitname, arr_split)
+            linea = LineStringCollection(object_circuit.geom_text).getLinestringCollectAsArrayself()
+        circuiteline = CircuitLinesDTO(circuits.mnemonico, linea)
         circ.add_layers(circuiteline)
 
-        ##LabeledPolyline
-        labeled_polyline = LabeledPolylineDTO(circ.circuitmnemonico,
-                                              np.array([-435029.019, 4925910.677, 0, -436366.272, 4922753.102, 0]))
-        circ.add_layers(labeled_polyline)
+        ##LabeledPolyline De momento no se pone
+        # labeled_polyline = LabeledPolylineDTO(circ.circuitmnemonico,
+        #                                       np.array([-435029.019, 4925910.677, 0, -436366.272, 4922753.102, 0]))
+        # circ.add_layers(labeled_polyline)
 
         # PylonSet
-        pylonset = PylonSetDTO(circ.circuitmnemonico)
         pylons = PylonDAO(session).getPylonsFromCircuit(circuits)
-        for pylon in pylons:
-            pylon_ = PylonDTO(pylon)
-            pylonset.add_pylons(pylon_)
-        circ.add_layers(pylonset)
-        composite_scene.add(circ)
+        if len(pylons) > 0:
+            pylonset = PylonSetDTO(circ.circuitmnemonico)
+            for pylon in pylons:
+                point = Point(pylon.geom_text).getPointAsArray()
+                pylon_ = PylonDTO(pylon, point)
+                pylonset.add_pylons(pylon_)
+            circ.add_layers(pylonset)
 
-    # print(composite_scene.generateSceneJSON())
+        # Towerline
+
+        # Get hipothesis data
+        hipothesis_types = HipothesisDAO().getHipothesis()
+
+        for hipothesis in hipothesis_types:
+            # get towerline by circuitid and hipothesis
+            # towerlines_data = TowerLineDao().TowerLineByCircuitAndHipothesis(circuits.id, hipothesis[0])
+            towerlines_data = TowerLineDao2(session).getPylonsFromCircuit(circuits.id, hipothesis[0])
+            if len(towerlines_data) > 0:
+                towerline_set = TowerLineSetDTO(circ.circuitmnemonico, hipothesis)
+                for towerline in towerlines_data:
+                    towerline = TowerLineDTO(towerline)
+                    towerline_set.add_towerlines(towerline)
+                circ.add_layers(towerline_set)
+
+        composite_scene.add(circ)
+        # break
+
     data_json = composite_scene.generateSceneJSON()
 
-    # data_string = scene_main.generateSceneJSON()
-    # print(data_string)
     with open(os.getcwd() + "\layer.json", "w") as file:
         json.dump(data_json, file, indent=4)
+
+    fin = time.time()
+    print(fin - inicio)

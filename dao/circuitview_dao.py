@@ -6,7 +6,7 @@ from orm.lidarsource import LidarSource, Circuits, Server
 from orm.pylons import Country, Region, Area, Pylons
 
 
-class CircuitViewDao():
+class CircuitViewDao:
 
     def __init__(self, session):
         self.session = session
@@ -35,5 +35,15 @@ class CircuitViewDao():
                                                   isouter=True
                                                   ).join(Company, Company.id == CompaniesCountriesXref.companyid,
                                                          isouter=True
-                                                         ).distinct().order_by(CircuitsPylonsXref.circuitid).filter(
-            Region.name == zone).all()
+                                                         ).distinct().order_by(CircuitsPylonsXref.circuitid).all()
+
+    def getCircuitsNewForZone(self, zone):
+        return self.session.query(Circuits
+                                  ).join(CircuitsPylonsXref,
+                                         CircuitsPylonsXref.circuitid == Circuits.id
+                                         ).join(Pylons,
+                                                CircuitsPylonsXref.pylonid == Pylons.id
+                                                ).join(Area, Area.id == Pylons.areaid, isouter=True
+                                                       ).join(Region, Region.id == Area.regionid, isouter=True
+                                                              ).distinct().filter(Region.name == zone).order_by(
+            Circuits.id).all()

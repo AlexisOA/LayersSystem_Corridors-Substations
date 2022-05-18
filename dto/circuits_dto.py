@@ -8,30 +8,10 @@ from dto.composite.I_Scene import IScene
 
 
 class CircuitsDTO(IScene):
-    compnayid: int
-    companyname: str
-    countryid: int
-    countryname: str
-    regionid: int
-    regionname: str
-    areaid: int
-    areaname: str
-    circuitid: int
-    circuitmnemonico: str
-    type: str
-    metadata: str
 
     def __init__(self, obj):
-        self.compnayid = obj.companyid
-        self.companyname = obj.companyname
-        self.countryid = obj.countryid
-        self.countryname = obj.countryname
-        self.regionid = obj.regionid
-        self.regionname = obj.regionname
-        self.areaid = obj.areaid
-        self.areaname = obj.areaname
-        self.circuitid = obj.circuitid
-        self.circuitmnemonico = obj.circuitname
+        self.circuitid = obj.id
+        self.circuitmnemonico = obj.mnemonico
         self.type = "Composite"
         self.metadata = "No circuit Metadata"
         self.children: List[ILayers] = []

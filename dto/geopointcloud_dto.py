@@ -3,10 +3,6 @@ from dto.composite.I_Layers import ILayers
 
 
 class GeoPointcloudDTO(ILayers):
-    id: int = ""
-    types: str = "GeoPointcloud"
-    metadata: str = ""
-    url: str = ""
 
     def __init__(self, obj):
         self.id = obj['circuitname']
