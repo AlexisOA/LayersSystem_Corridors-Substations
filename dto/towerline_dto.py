@@ -18,10 +18,12 @@ class TowerLineDTO(ILayers):
         self.name = towerline_data.name
         self.polyline_coords = LineString(towerline_data.geom_text).getLinestringAsArray()
         self.phase = towerline_data.phase
+        self.year = towerline_data.year
 
     def generateLayersJSON(self):
         return {
             "id": self.id,
             "name": self.name,
             "polyline_coords": self.polyline_coords,
-            "phase": self.phase}
+            "phase": self.phase,
+            "year": self.year}

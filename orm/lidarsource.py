@@ -122,6 +122,7 @@ class Year(Base):
     id = Column(Integer, primary_key=True)
     year = Column(Integer)
     yearsource = relationship('SpanHipothesisGeoms', backref='yearsource', lazy=True)
+    year_distance = relationship('DistanceIncidences', backref='year_distance', lazy=True)
 
 
 class ElectricSpans(Base):
@@ -140,3 +141,73 @@ class Hipothesis(Base):
     longname = Column(Text)
     wind = Column(Integer)
     temperature = Column(Numeric)
+    hipo_span = relationship('SpanHipothesisGeoms', backref='hipo_span', lazy=True)
+    hipo_distance = relationship('DistanceIncidences', backref='hipo_distance', lazy=True)
+
+
+class DistanceIncidences(Base):
+    __tablename__ = 'distanceincidences'
+    id = Column(Integer, primary_key=True)
+    aerolaserid = Column(Integer)
+    x = Column(Numeric)
+    y = Column(Numeric)
+    z = Column(Numeric)
+    date = Column(DateTime(), default=datetime.now())
+    temperature = Column(Numeric)
+    windspeed = Column(Numeric)
+    winddirection = Column(Text)
+    result = Column(Text)
+    l1 = Column(Numeric)
+    l2 = Column(Numeric)
+    distance = Column(Numeric)
+    notes = Column(Text)
+    geom = Column(Geometry('POINT'))
+    distanceincidencerangesid = Column(Integer)
+    spanid = Column(Integer, ForeignKey('spans.id'))
+    hipothesisid = Column(Integer, ForeignKey('hipothesis.id'))
+    grouppoints = Column(Geometry('MULTIPOINT'))
+    yearid = Column(Integer, ForeignKey('years.id'))
+
+
+class Spans(Base):
+    __tablename__ = 'spans'
+    id = Column(Integer, primary_key=True)
+    beginpylonid = Column(Integer)
+    endpylonid = Column(Integer)
+    ut = Column(Text)
+    spans_distance = relationship('DistanceIncidences', backref='spans_distance', lazy=True)
+
+
+class DistanceIncidencesRanges(Base):
+    __tablename__ = 'distanceincidencesranges'
+    id = Column(Integer, primary_key=True)
+    areaid = Column(Integer, ForeignKey('areas.id'))
+    distanceincidencetypeid = Column(Integer, ForeignKey('distanceincidencetypes.id'))
+    regulationid = Column(Integer, ForeignKey('regulations.id'))
+    distanceseverityid = Column(Integer, ForeignKey('distanceseverities.id'))
+    value = Column(Numeric)
+
+
+class DistanceSeverities(Base):
+    __tablename__ = 'distanceseverities'
+    id = Column(Integer, primary_key=True)
+    name = Column(Text)
+    value = Column(Integer)
+    distance_severities = relationship('DistanceIncidencesRanges', backref='distance_severities', lazy=True)
+
+
+
+class DistanceIncidenceTypes(Base):
+    __tablename__ = 'distanceincidencetypes'
+    id = Column(Integer, primary_key=True)
+    name = Column(Text)
+    distance_types = relationship('DistanceIncidencesRanges', backref='distance_types', lazy=True)
+
+
+
+class Regulations(Base):
+    __tablename__ = 'regulations'
+    id = Column(Integer, primary_key=True)
+    name = Column(Text)
+    regulations = relationship('DistanceIncidencesRanges', backref='regulations', lazy=True)
+

@@ -22,8 +22,9 @@ class HipothesisDAO:
                 close_connection(conn)
 
     def getHipothesis(self):
+        #Query for three types of hipothesis, change number LIMIT for show one, two or three hipothesis
         query = """
-        SELECT * FROM hipothesis inner join years on (years.id = hipothesis.id);
+        SELECT * FROM hipothesis LIMIT 3;
         """
         res = self.runQuery(query)
         return res

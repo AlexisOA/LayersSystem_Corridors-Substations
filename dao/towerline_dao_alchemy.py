@@ -1,7 +1,8 @@
 import psycopg2
 import numpy as np
 from connection.database import get_connection, close_connection
-from orm.lidarsource import Circuits, CircuitGeoms, CircuitGeomTypes, ElectricSpans, SpanHipothesisGeoms, Hipothesis
+from orm.lidarsource import Circuits, CircuitGeoms, CircuitGeomTypes, ElectricSpans, SpanHipothesisGeoms, Hipothesis, \
+    Year
 from sqlalchemy import func
 
 
@@ -15,8 +16,9 @@ class TowerLineDao2:
                                   SpanHipothesisGeoms.id.label('spanhipothesis_id'),
                                   func.ST_AsText(func.ST_Transform(SpanHipothesisGeoms.geom, 3857)).label('geom_text'),
                                   Hipothesis.wind.label('wind'), Hipothesis.temperature.label('temperature'), Hipothesis.longname.label('longname'), Hipothesis.name.label('name'),
-                                  SpanHipothesisGeoms.phase.label('phase')
-                                  ).join(Hipothesis, Hipothesis.id == SpanHipothesisGeoms.hipothesisid
+                                  SpanHipothesisGeoms.phase.label('phase'),
+                                  Year.year.label('year')
+                                  ).join(Year, Year.id == SpanHipothesisGeoms.yearid).join(Hipothesis, Hipothesis.id == SpanHipothesisGeoms.hipothesisid
                                          ).join(ElectricSpans, ElectricSpans.id == SpanHipothesisGeoms.electricspanid
                                                 ).join(
             Circuits, Circuits.id == ElectricSpans.circuitid

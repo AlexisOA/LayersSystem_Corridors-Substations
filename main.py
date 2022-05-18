@@ -2,11 +2,14 @@ import numpy as np
 from connection.database import get_session
 from dao.circuitline_dao import CircuitlineDAO
 from dao.circuitview_dao import CircuitViewDao
+from dao.distanceincidence_dao import DistanceIncidenceDAO
 from dao.geopointcloud_dao import GeoPointcloudDAO
 from dao.hipothesis_dao import HipothesisDAO
 from dao.pylon_dao import PylonDAO
 from dao.towerline_dao import TowerLineDao
 from dao.towerline_dao_alchemy import TowerLineDao2
+from dto.anomaliesset_dto import AnomaliesSetDTO
+from dto.anomaly_dto import AnomalyDTO
 from dto.circuitlines_dto import CircuitLinesDTO
 from dto.circuits_dto import CircuitsDTO
 from dto.composite.scene_composite import ScenesComposite
@@ -29,22 +32,22 @@ if __name__ == '__main__':
     scene_json = SceneMap3857()
     composite_scene = ScenesComposite()
 
-    circuits_view = CircuitViewDao(session).getCircuitsNewForZone('CENTRO')
-
-    # scene_main = Scene()  NOT USE
+    circuits_view = CircuitViewDao(session).getCircuitsNewForZone('NOROESTE')
+    print("Número de circuitos en la zona NOROESTE -> ", len(circuits_view))
+    ## scene_main = Scene()  NOT USE
     composite_scene.add(scene_json)
     for circuits in circuits_view:
         circ = CircuitsDTO(circuits)
-        # Get all pointclouds from circuit
-        print(circuits.id)
+        ## Get all pointclouds from circuit
+        print("ID: ", circuits.id)
         lidar_query = GeoPointcloudDAO(session).test(circuits)
-        # Iterate pointcloud and serialize to GeoPointCloudDTO
+        ## Iterate pointcloud and serialize to GeoPointCloudDTO
         for lidar in lidar_query:
             if lidar:
                 geo = GeoPointcloudDTO(lidar)
                 circ.add_layers(geo)
 
-        # circuitline
+        ## circuitline
         circuit_line = CircuitlineDAO(session).getCircuitLineById(circuits)
         linea = []
         for object_circuit in circuit_line:
@@ -54,12 +57,12 @@ if __name__ == '__main__':
         circuiteline = CircuitLinesDTO(circuits.mnemonico, linea)
         circ.add_layers(circuiteline)
 
-        ##LabeledPolyline De momento no se pone
-        # labeled_polyline = LabeledPolylineDTO(circ.circuitmnemonico,
+        ## LabeledPolyline -> Lines that user draw in the scene, at that moment not
+        #  labeled_polyline = LabeledPolylineDTO(circ.circuitmnemonico,
         #                                       np.array([-435029.019, 4925910.677, 0, -436366.272, 4922753.102, 0]))
-        # circ.add_layers(labeled_polyline)
+        #  circ.add_layers(labeled_polyline)
 
-        # PylonSet
+        ## PylonSet
         pylons = PylonDAO(session).getPylonsFromCircuit(circuits)
         if len(pylons) > 0:
             pylonset = PylonSetDTO(circ.circuitmnemonico)
@@ -69,14 +72,13 @@ if __name__ == '__main__':
                 pylonset.add_pylons(pylon_)
             circ.add_layers(pylonset)
 
-        # Towerline
-
-        # Get hipothesis data
+        ## Towerline
+        ## Get hipothesis data
         hipothesis_types = HipothesisDAO().getHipothesis()
 
         for hipothesis in hipothesis_types:
-            # get towerline by circuitid and hipothesis
-            # towerlines_data = TowerLineDao().TowerLineByCircuitAndHipothesis(circuits.id, hipothesis[0])
+            ## get towerline by circuitid and hipothesis
+            #  towerlines_data = TowerLineDao().TowerLineByCircuitAndHipothesis(circuits.id, hipothesis[0])
             towerlines_data = TowerLineDao2(session).getPylonsFromCircuit(circuits.id, hipothesis[0])
             if len(towerlines_data) > 0:
                 towerline_set = TowerLineSetDTO(circ.circuitmnemonico, hipothesis)
@@ -85,13 +87,25 @@ if __name__ == '__main__':
                     towerline_set.add_towerlines(towerline)
                 circ.add_layers(towerline_set)
 
+
+
+        ##Anomalies,
+        anomalies = DistanceIncidenceDAO(session).getAnomalysByCircuitID(circuits.id)
+        print("Anomalias para circuitid: ", len(anomalies))
+        if len(anomalies):
+            anomalies_set = AnomaliesSetDTO(circuits.id)
+            for anomaly in anomalies:
+                anomalie = AnomalyDTO(anomaly)
+                anomalies_set.add_anomalies(anomalie)
+            circ.add_layers(anomalies_set)
         composite_scene.add(circ)
-        # break
 
     data_json = composite_scene.generateSceneJSON()
 
     with open(os.getcwd() + "\layer.json", "w") as file:
+        print("Generating json...")
         json.dump(data_json, file, indent=4)
+        print("Json generated succesfully")
 
     fin = time.time()
     print(fin - inicio)
