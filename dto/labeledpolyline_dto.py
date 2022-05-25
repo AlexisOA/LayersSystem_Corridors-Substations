@@ -5,7 +5,7 @@ import numpy as np
 
 class LabeledPolylineDTO(ILayers):
     id: int = ""
-    types: str = "CircuitLine"
+    types: str = "LabeledPolyline"
     metadata: str = ""
     coords: np.ndarray = []
 

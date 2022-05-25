@@ -19,7 +19,7 @@ class GeoPointcloudDAO():
 
     def test(self, circuits):
         return self.session.query(LidarSource.path.label('path'),
-                                  Circuits.mnemonico.label('circuitname'),
+                                  Circuits.mnemonico.label('mnemonico'),
                                   Server.name.label('servername')
                                   ).join(CircuitsPylonsXref,
                                          CircuitsPylonsXref.circuitid == Circuits.id
@@ -29,5 +29,5 @@ class GeoPointcloudDAO():
                                                        ).join(Region, Region.id == Area.regionid, isouter=True
                                                               ).join(LidarSource, LidarSource.circuitid == Circuits.id
                                          ).join(Server, LidarSource.serverid == Server.id
-                                                ).distinct().filter(Region.name == 'CENTRO').filter(Circuits.id == circuits.id).order_by(Circuits.id).all()
+                                                ).distinct().filter(Region.name == 'NOROESTE').filter(Circuits.id == circuits).order_by(Circuits.id).all()
 

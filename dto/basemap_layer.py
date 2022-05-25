@@ -1,7 +1,7 @@
 from dto.composite.I_Scene import IScene
 
 
-class SceneMap3857(IScene):
+class BaseMapLayer(IScene):
     id: str
     types: str
     metadata: str

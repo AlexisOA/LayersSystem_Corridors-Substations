@@ -20,5 +20,5 @@ class PylonDAO():
                                   func.ST_AsText(func.ST_Transform(Pylons.geom, 3857)).label('geom_text')
                                   ).join(CircuitsPylonsXref, CircuitsPylonsXref.circuitid == Circuits.id
                                          ).join(Pylons, CircuitsPylonsXref.pylonid == Pylons.id
-                                                ).filter(Circuits.id == circuits.id).all()
+                                                ).filter(Circuits.id == circuits).all()
 

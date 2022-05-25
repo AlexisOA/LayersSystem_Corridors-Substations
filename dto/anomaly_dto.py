@@ -23,4 +23,4 @@ class AnomalyDTO(ILayers):
             "secondary_points": self.secondary_points,
             "year": self.year,
             "severity_id": self.severity_id,
-            "hypothesis_id": self.hypothesis_id}
+            "hypothesis_id": "hypothesis0" + str(self.hypothesis_id)}

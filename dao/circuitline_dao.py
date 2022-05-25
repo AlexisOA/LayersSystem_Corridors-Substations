@@ -15,7 +15,7 @@ class CircuitlineDAO:
                                   # func.ST_AsText(CircuitGeoms.geom).label('geom_text'),
                                      ).join(CircuitGeoms,CircuitGeoms.circuitid == Circuits.id
                                     ).join(CircuitGeomTypes,CircuitGeomTypes.id == CircuitGeoms.geomtypeid
-                                           ).filter(CircuitGeomTypes.name == "Tower_String").filter(Circuits.id == circuits.id).all()
+                                           ).filter(CircuitGeomTypes.name == "Tower_String").filter(Circuits.id == circuits).all()
 
     def runQueryById(self, query, id):
         conn = None
