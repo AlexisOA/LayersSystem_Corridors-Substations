@@ -47,3 +47,15 @@ class CircuitViewDao:
                                                        ).join(Region, Region.id == Area.regionid, isouter=True
                                                               ).distinct().filter(Region.name == zone).order_by(
             Circuits.id).all()
+
+
+    def getCircuitsNewForZoneandId(self, zone, tuple_ids):
+        return self.session.query(Circuits
+                                  ).join(CircuitsPylonsXref,
+                                         CircuitsPylonsXref.circuitid == Circuits.id
+                                         ).join(Pylons,
+                                                CircuitsPylonsXref.pylonid == Pylons.id
+                                                ).join(Area, Area.id == Pylons.areaid, isouter=True
+                                                       ).join(Region, Region.id == Area.regionid, isouter=True
+                                                              ).distinct().filter(Region.name == zone).filter(Circuits.id.in_(tuple_ids)).order_by(
+            Circuits.id).all()
