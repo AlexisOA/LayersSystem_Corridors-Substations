@@ -29,6 +29,7 @@ from dto.towerlineset_dto import TowerLineSetDTO
 class JsonLayer():
     def __init__(self,
                  circuit_zone: str,
+                 number_towerlines:int,
                  parent_directory: str = ""):
 
         self.circuit_zone = circuit_zone
@@ -39,6 +40,7 @@ class JsonLayer():
         self.circuit = None
         self._circuits_name = []
         self.data_json = None
+        self.number_towerlines = number_towerlines
 
     def get_circuits_name_array(self):
         return self._circuits_name
@@ -75,7 +77,7 @@ class JsonLayer():
     def create_json(self):
         self.data_json = self.composite_scene.generateSceneJSON()
 
-        with open(self._parent_directory + "\layer.json", "w") as file:
+        with open(self._parent_directory + "\scene_five_corridors.json", "w") as file:
             print("Generating json...")
             json.dump(self.data_json, file, indent=4)
             print("Json generated succesfully")
@@ -116,7 +118,7 @@ class JsonLayer():
             self.circuitDTO.add_layers(pylonset)
 
     def get_towerline_from_circuit(self, circuit_id):
-        hipothesis_types = HipothesisDAO().getHipothesis()
+        hipothesis_types = HipothesisDAO().getHipothesis(self.number_towerlines)
 
         for hipothesis in hipothesis_types:
             ## get towerline by circuitid and hipothesis

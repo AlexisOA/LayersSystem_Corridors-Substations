@@ -6,7 +6,7 @@ class GeoPointcloudDTO(ILayers):
 
     def __init__(self, obj):
         self.id = obj.mnemonico
-        self.types = "GeoPointcloud"
+        self.types = "GeoPointCloud"
         self.metadata = "No pointcloud metadata"
         self.url = obj.path
 

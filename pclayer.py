@@ -6,10 +6,12 @@ from json_layers import JsonLayer
 
 
 def start_menu(circuit_zone: str,
-               parent_directory: str):
+               parent_directory: str,
+               number_towerlines: int):
     exit_program = False
     option = 0
     layer = JsonLayer(circuit_zone=circuit_zone,
+                      number_towerlines=number_towerlines,
                       parent_directory=parent_directory)
 
     while not exit_program:
@@ -93,8 +95,8 @@ def choose_circuit(layer):
 
 def main(args):
 
-    # example: -z NOROESTE -o path/to/out
-    # example: -z CANARIAS -o path/to/out
+    # example: -z NOROESTE -o path/to/out -n_tw 3
+    # example: -z CANARIAS -o path/to/out --num_towerlines 1
 
     parser = argparse.ArgumentParser()
 
@@ -106,6 +108,8 @@ def main(args):
                         help='circuit zone to get, you can choose either -> NORTE, CENTRO, NOROESTE, CANARIAS')
     # parser.add_argument("-z", "--circuits_zone", help="Path to point class definition file.",
     #                     type=str, default=None)
+    parser.add_argument("-n_tw", "--num_towerlines", help="Number of towerlines in circuits",
+                        type=int, default=1)
 
     args = parser.parse_args(args)  # getting optionals
 
@@ -119,7 +123,8 @@ def main(args):
 
     start_menu(
         circuit_zone=args.circuits_zone,
-        parent_directory=args.out
+        parent_directory=args.out,
+        number_towerlines=args.num_towerlines
     )
 
 
